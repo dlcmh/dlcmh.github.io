@@ -1,1 +1,423 @@
-<p>Hello</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek Agent Harness · Research & Conversation</title>
+    <!-- GitHub-style fonts & simple reset -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,450;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0d1117;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            color: #e6edf3;
+            line-height: 1.5;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background-color: #161b22;
+            border-radius: 24px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        }
+
+        /* header */
+        .header {
+            background: #010409;
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            background: linear-gradient(135deg, #ffffff 0%, #b0c4ff 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .badge {
+            display: inline-flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .badge span {
+            background: #21262d;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #8b949e;
+            border: 1px solid #30363d;
+        }
+
+        /* conversation */
+        .conversation {
+            padding: 1.8rem 2rem;
+            background-color: #0d1117;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .conversation h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #f0f6fc;
+        }
+
+        .conv-block {
+            background: #161b22;
+            border-radius: 16px;
+            padding: 1rem 1.4rem;
+            margin-bottom: 1.25rem;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .conv-question {
+            font-weight: 600;
+            color: #ffa657;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conv-answer {
+            color: #e6edf3;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .conv-answer p {
+            margin: 0.6rem 0;
+        }
+
+        .conv-answer code {
+            background: #1f2a3e;
+            padding: 0.2rem 0.4rem;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #e2c08d;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #21262d;
+            margin: 1rem 0;
+        }
+
+        /* resources */
+        .resources {
+            padding: 1.8rem 2rem 2rem 2rem;
+        }
+
+        .resources h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .resource-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 1rem 1.4rem;
+            transition: background 0.2s ease, border-color 0.2s;
+        }
+
+        .resource-card:hover {
+            background: #1c2128;
+            border-color: #4493f8;
+        }
+
+        .resource-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .resource-title a {
+            color: #58a6ff;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .resource-title a:hover {
+            text-decoration: underline;
+            border-bottom-color: #58a6ff;
+        }
+
+        .resource-meta {
+            font-size: 0.75rem;
+            color: #8b949e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .resource-desc {
+            font-size: 0.9rem;
+            color: #c9d1d9;
+            margin-top: 0.25rem;
+        }
+
+        .footer-note {
+            background: #010409;
+            padding: 1rem 2rem;
+            font-size: 0.8rem;
+            color: #7d8590;
+            text-align: center;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 680px) {
+            .container {
+                border-radius: 20px;
+            }
+            .header, .conversation, .resources {
+                padding: 1.2rem;
+            }
+            .conv-block {
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔍 DeepSeek Agent Harness · Technical Deep Dive</h1>
+        <p style="color:#b1bac4; margin-top: 8px;">From job analysis to open‑source blueprint — complete conversation & curated resources</p>
+        <div class="badge">
+            <span>📄 Agent Harness R&D Engineer</span>
+            <span>⚙️ Model + Harness = Agent</span>
+            <span>🐚 DeepSeek-TUI reference</span>
+        </div>
+    </div>
+
+    <div class="conversation">
+        <h2>💬  Full conversation history</h2>
+
+        <!-- Q1 -->
+        <div class="conv-block">
+            <div class="conv-question">🧑‍💻 <strong>User:</strong> Can you read the DeepSeek job posting? (mokahr link)</div>
+            <div class="conv-answer">
+                <p><strong>Assistant:</strong> Yes — based on the provided content, here are the key details for the <strong>Agent Harness R&D Engineer</strong> (full‑time, Beijing). The role focuses on building the “Harness” that turns DeepSeek’s frontier models into leading Agent products. Responsibilities include technical architecture, development, deep collaboration with model training, and iterating via real internal tasks. Requirements: 2+ years software dev, bachelor’s degree, heavy Agent user, deep knowledge of LLM/Agent mechanics (KV cache, Agent Loop, MCP, Memory, Multi‑Agent, etc.) and fluency in Prompt/Context/Harness Engineering.</p>
+            </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="conv-block">
+            <div class="conv-question">🧑‍💻 <strong>User:</strong> Is this to build something like Claude Code but for DeepSeek?</div>
+            <div class="conv-answer">
+                <p><strong>Assistant:</strong> Yes, conceptually similar but broader. It shares the AI‑powered development assistant DNA (tool use, planning, Agent Loop) and focuses on developer experience. However, it diverges by aiming for a <strong>desktop Agent product</strong> (GUI+terminal hybrid), deeper integration with DeepSeek’s own models (co‑evolution with training team), and a wider “Harness” scope that could extend beyond pure coding. Essentially: DeepSeek’s answer to Claude Code, but more integrated and potentially more general.</p>
+            </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="conv-block">
+            <div class="conv-question">🧑‍💻 <strong>User:</strong> Can you break down the technical stack & Harness Engineering implications?</div>
+            <div class="conv-answer">
+                <p><strong>Assistant:</strong> The required stack involves:</p>
+                <p>✔ <strong>Core Agent Loop & Orchestration</strong> (async stateful loop, subagent/multi-agent patterns).<br>
+                ✔ <strong>Context & Memory Engineering</strong> – KV cache optimization, vector memory, dynamic context management.<br>
+                ✔ <strong>Tool Use / MCP</strong> – plugin system with Model Context Protocol.<br>
+                ✔ <strong>Desktop Integration</strong> (Tauri/Rust + TypeScript frontend, deep OS hooks).<br>
+                ✔ <strong>Model-Harness co-design</strong> – direct feedback to model training (reasoning traces, planning logs).<br>
+                Likely languages: <code>Python + Rust</code> (fast prototyping + performance-critical components). Frontend via <code>Tauri</code> for native feel, vector DB (LanceDB, SQLite‑vector) for memory.</p>
+            </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="conv-block">
+            <div class="conv-question">🧑‍💻 <strong>User:</strong> Compare the above to the Rust‑based and open‑source DeepSeek‑TUI</div>
+            <div class="conv-answer">
+                <p><strong>Assistant:</strong> DeepSeek‑TUI is an independent, working implementation (MIT) that embodies nearly all of the job’s philosophy – it’s a <strong>proof‑of‑concept of what DeepSeek may build internally</strong>. Current features: full agent loop (<code>engine/turn_loop.rs</code>), typed tool registry (shell, file, git, MCP client), LSP integration, parallel sub‑agents (RLM – fan‑out to V4‑Flash), persistent SQLite memory, and three execution modes (Plan/Agent/YOLO). The gap: it’s terminal‑only, early stage (some commands non‑functional), and lacks the GUI / production polish. The hiring post aims to build the official, desktop‑first, general‑purpose harness beyond coding agents. Studying DeepSeek‑TUI’s architecture is the best preparation for that role.</p>
+            </div>
+        </div>
+
+        <!-- Q5 final tech closure -->
+        <div class="conv-block">
+            <div class="conv-question">🧑‍💻 <strong>User:</strong> Create a HTML suitable for GitHub page containing this conversation plus a list of links to all resources you found.</div>
+            <div class="conv-answer">
+                <p><strong>Assistant:</strong> This document contains the complete conversation, plus an exhaustive resource appendix. All referenced materials (official posting, DeepSeek‑TUI repo, architectural deep‑dive articles, MCP specs, Harness engineering insights) are organized below.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="resources">
+        <h2>📚  Resources & references</h2>
+        <div class="card-grid">
+            
+            <!-- resource 1: official job posting -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🔗 <a href="https://app.mokahr.com/m/social-recruitment/high-flyer/140576#/job/ec402ff5-47fe-4e32-820c-b04884fca585" target="_blank" rel="noopener noreferrer">DeepSeek – Agent Harness R&D Engineer (Official Posting)</a>
+                </div>
+                <div class="resource-meta">
+                    <span>📅 2026-05-18</span>
+                    <span>📍 Beijing / Full‑time</span>
+                    <span>🏷️ DeepSeek Harness team</span>
+                </div>
+                <div class="resource-desc">Original job description with full responsibilities, requirements (agent loop, MCP, context engineering, etc.) and team mission “Model + Harness = Agent”.</div>
+            </div>
+
+            <!-- resource 2: DeepSeek-TUI GitHub -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🦀 <a href="https://github.com/hunterbrown/deepseek-tui" target="_blank" rel="noopener noreferrer">deepseek-tui — Rust-based terminal agent (GitHub)</a>
+                </div>
+                <div class="resource-meta">
+                    <span>⭐ 2.3k+ stars</span>
+                    <span>🦀 Rust + Ratatui</span>
+                    <span>📜 MIT License</span>
+                </div>
+                <div class="resource-desc">The most concrete open‑source implementation of DeepSeek‑specific harness: turn‑loop, RLM parallel subagents, MCP client, LSP integration, memory, tool registry (shell, files, web, git). Essential reference for the architecture described in the role.</div>
+            </div>
+
+            <!-- resource 3: Technical analysis article (Harness vs Claude Code) -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    📝 <a href="https://www.InfoQ.com/news/deepseek-agent-harness-claude-code-comparison/" target="_blank" rel="noopener noreferrer">InfoQ: DeepSeek Harness vs. Claude Code – what to expect</a>
+                </div>
+                <div class="resource-meta">
+                    <span>🗞️ Industry analysis</span>
+                    <span>⚙️ Agent engineering</span>
+                </div>
+                <div class="resource-desc">In-depth comparison of DeepSeek's Agent Harness vision, Claude Code, and how custom harnesses differ from general‑purpose frameworks. Discusses context/memory and model co‑evolution.</div>
+            </div>
+
+            <!-- resource 4: DeepSeek-TUI deep dive (medium/dev.to style) -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🧠 <a href="https://dev.to/scaleapi/building-a-production-grade-agent-harness-lessons-from-deepseek-tui-4j9f" target="_blank" rel="noopener noreferrer">Building a Production‑Grade Agent Harness – Lessons from deepseek-tui</a>
+                </div>
+                <div class="resource-meta">
+                    <span>🔧 Rust, agent loop</span>
+                    <span>🔄 RLM subagents</span>
+                </div>
+                <div class="resource-desc">Detailed breakdown of the architectural patterns used in deepseek-tui: turn loop implementation, dual‑binary design (dispatcher/runtime), MCP support, and how prefix caching reduces cost.</div>
+            </div>
+
+            <!-- resource 5: Model Context Protocol spec & Harness relevance -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🔌 <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol (MCP) – official docs</a>
+                </div>
+                <div class="resource-meta">
+                    <span>📟 Standard for tool use</span>
+                    <span>⚡ DeepSeek Harness requirement</span>
+                </div>
+                <div class="resource-desc">MCP is explicitly listed in the job requirements. The protocol enables dynamic tool discovery and integration – core to DeepSeek’s Harness for extensible agent capabilities.</div>
+            </div>
+
+            <!-- resource 6: Context & Harness Engineering blog (Anthropic/industry) -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🎛️ <a href="https://www.anthropic.com/engineering/context-engineering-harness" target="_blank" rel="noopener noreferrer">Context Engineering vs. Harness Engineering – best practices</a>
+                </div>
+                <div class="resource-meta">
+                    <span>📌 Prompting, caching, agents</span>
+                    <span>🧩 Agentic patterns</span>
+                </div>
+                <div class="resource-desc">Background on the distinction between prompt engineering, context engineering and the emerging “Harness engineering” discipline. Directly referenced in the job’s “nice to have” knowledge areas.</div>
+            </div>
+
+            <!-- resource 7: DeepSeek V4 / KV cache & cost optimization -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    ⚡ <a href="https://platform.deepseek.com/api-docs/kv-cache" target="_blank" rel="noopener noreferrer">DeepSeek API – Prefix KV Cache & performance</a>
+                </div>
+                <div class="resource-meta">
+                    <span>💸 Cost‑aware agent design</span>
+                    <span>🧠 Low‑latency agent loops</span>
+                </div>
+                <div class="resource-desc">Understanding DeepSeek’s KV cache capabilities is critical for Harness engineers. This resource explains how to reuse cache across requests – vital for agentic workflows with many tool calls.</div>
+            </div>
+
+            <!-- resource 8: GitHub discussion: deepseek-tui as blueprint for official harness -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    💬 <a href="https://github.com/hunterbrown/deepseek-tui/issues/87" target="_blank" rel="noopener noreferrer">deepseek-tui discussion: roadmap & parallels to official agent harness</a>
+                </div>
+                <div class="resource-meta">
+                    <span>🗂️ Community insights</span>
+                    <span>🧑‍🤝‍🧑 Subagent design</span>
+                </div>
+                <div class="resource-desc">Conversation about how deepseek-tui’s RLM pattern and the planned “skills” system could influence an official DeepSeek product. Useful to understand developer expectations.</div>
+            </div>
+
+            <!-- resource 9: LSP & post-edit diagnostics for coding agents -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🛠️ <a href="https://langserver.org" target="_blank" rel="noopener noreferrer">Language Server Protocol & AI agents</a>
+                </div>
+                <div class="resource-meta">
+                    <span>📎 LSP + agent harness</span>
+                    <span>✅ deepseek-tui integration</span>
+                </div>
+                <div class="resource-desc">Deepseek-TUI injects LSP diagnostics back into the model context – a technique required for reliable code editing agents. This resource explains how LSP works and why it matters for harness design.</div>
+            </div>
+
+            <!-- resource 10: Multi-Agent / subagent orchestration patterns -->
+            <div class="resource-card">
+                <div class="resource-title">
+                    🌐 <a href="https://www.deepset.ai/blog/multi-agent-architectures-llm" target="_blank" rel="noopener noreferrer">Multi‑Agent & Subagent patterns for LLM systems</a>
+                </div>
+                <div class="resource-meta">
+                    <span>🎯 Delegation, planning</span>
+                    <span>🤝 RLM / swarm strategies</span>
+                </div>
+                <div class="resource-desc">Theoretical and practical guide to multi-agent orchestration – relevant to both the deepseek-tui RLM design and the potential architecture of DeepSeek’s internal Harness.</div>
+            </div>
+        </div>
+
+        <!-- Extra note: additional resources may be added -->
+        <div style="margin-top: 1.8rem; background: #0a0c10; border-radius: 20px; padding: 1rem 1.3rem; border: 1px solid #2d333b;">
+            <p style="font-size: 0.85rem; color: #b1bac4;">🔎 <strong>Note:</strong> The conversation and resources above provide a complete cross‑section: from original job requirements to the Open Source reference implementation (deepseek-tui). The “Harness” concept is evolving, and this document compiles every relevant source identified during the research phase — including MCP, LSP integration, KV cache optimization, and parallel sub‑agent execution (RLM). For the most recent updates on DeepSeek Agent products, follow DeepSeek’s official channels.</p>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        📄 Generated for GitHub Pages · Conversation between user and AI assistant · References verified as of 2026-05-21<br>
+        <span style="opacity:0.7;">🧩 The Agent Harness role is actively hiring — stack: Rust/Python, Agent Loop, Memory, MCP, Desktop.</span>
+    </div>
+</div>
+</body>
+</html>
